@@ -1,10 +1,30 @@
 {
   "routes": {},
   "applications": {
-
+    "general-purpose-agent": {
+      "displayName": "General Purpose Agent",
+      "description": "General Purpose Agent. Equipped with: WEB search (DuckDuckGo via MCP), RAG search (supports PDF, TXT, CSV files), Python Code Interpreter (via MCP), Image Generation (model).",
+      "endpoint": "http://host.docker.internal:5030/openai/deployments/general-purpose-agent/chat/completions",
+      "forwardAuthToken": true,
+      "inputAttachmentTypes": [
+        "image/png",
+        "image/jpeg"
+      ]
+    }
   },
   "models": {
-
+    "gpt-4o": {
+      "displayName": "GPT 4o",
+      "endpoint": "http://adapter-dial:5000/openai/deployments/gpt-4o/chat/completions",
+      "iconUrl": "http://localhost:3001/gpt4.svg",
+      "type": "chat",
+      "upstreams": [
+        {
+          "endpoint": "https://ai-proxy.lab.epam.com/openai/deployments/gpt-4o/chat/completions",
+          "key": "{REPLACE_WITH_YOUR_API_KEY}"
+        }
+      ]
+    }
   },
   "keys": {
     "dial_api_key": {

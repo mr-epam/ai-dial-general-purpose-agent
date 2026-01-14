@@ -50,7 +50,7 @@ class GeneralPurposeAgent:
         #    - tools: provide list with tool schemas
         #    - deployment_name
         #    - make it stream
-        chunks = async_dial.chat.completions.create(
+        chunks = await async_dial.chat.completions.create(
             messages=self._prepare_messages(request.messages),
             tools=[tool.get_tool_schema() for tool in self.tools],
             deployment_name=deployment_name,
@@ -79,7 +79,7 @@ class GeneralPurposeAgent:
         #                     `function` `arguments` (if not present set them as empty string to not attach haphazardly None)
         #                     as `argument_chunk` and add it to the extracted from map tool_call function arguments
         async for chunk in chunks:
-            if chunk.choices:
+            if chunk.choices and len(chunk.choices) > 0:
                 delta = chunk.choices[0].delta
                 if delta:
                     if delta.content:

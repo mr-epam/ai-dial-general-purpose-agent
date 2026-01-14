@@ -91,7 +91,7 @@ class GeneralPurposeAgentApplication(ChatCompletion):
 app = DIALApp()
 agent_app = GeneralPurposeAgentApplication()
 
-app.chat_completion(
+app.add_chat_completion(
     deployment_name="general-purpose-agent",
     impl=agent_app
 )
