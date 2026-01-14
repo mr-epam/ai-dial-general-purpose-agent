@@ -32,7 +32,9 @@ class GeneralPurposeAgentApplication(ChatCompletion):
         # 3. Get tools, iterate through them and add them to created list as MCPTool where the client will be created
         #    MCPClient and mcp_tool_model will be the tool itself (see what `mcp_client.get_tools` returns).
         # 4. Return created tool list
+
         raise NotImplementedError()
+    
 
     async def _create_tools(self) -> list[BaseTool]:
         #TODO:
@@ -61,7 +63,22 @@ class GeneralPurposeAgentApplication(ChatCompletion):
         #       - deployment_name=DEPLOYMENT_NAME
         #       - request=request
         #       - response=response
-        raise NotImplementedError()
+        if not self.tools:
+            self.tools = await self._create_tools()
+
+        with response.create_single_choice() as choice:
+            agent = GeneralPurposeAgent(
+                endpoint=DIAL_ENDPOINT,
+                system_prompt=SYSTEM_PROMPT,
+                tools=self.tools
+            )
+            await agent.handle_request(
+                choice=choice,
+                deployment_name=DEPLOYMENT_NAME,
+                request=request,
+                response=response
+            )
+
 
 #TODO:
 # 1. Create DIALApp
@@ -70,3 +87,14 @@ class GeneralPurposeAgentApplication(ChatCompletion):
 #       - deployment_name="general-purpose-agent"
 #       - impl=agent_app
 # 4. Run it with uvicorn: `uvicorn.run({CREATED_DIAL_APP}, port=5030, host="0.0.0.0")`
+
+app = DIALApp()
+agent_app = GeneralPurposeAgentApplication()
+
+app.chat_completion(
+    deployment_name="general-purpose-agent",
+    impl=agent_app
+)
+
+if __name__ == "__main__":
+    uvicorn.run(app, port=5030, host="0.0.0.0")
