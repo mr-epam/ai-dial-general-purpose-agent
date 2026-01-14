@@ -52,7 +52,7 @@ class GeneralPurposeAgent:
         #    - make it stream
         chunks = await async_dial.chat.completions.create(
             messages=self._prepare_messages(request.messages),
-            tools=[tool.get_tool_schema() for tool in self.tools],
+            tools=[tool.schema for tool in self.tools],
             deployment_name=deployment_name,
             stream=True
         )
@@ -187,11 +187,12 @@ class GeneralPurposeAgent:
 
         # 5. Execute tool
         tool_message = await tool.execute(
-            params=ToolCallParams(
+            tool_call_params=ToolCallParams(
                 tool_call=tool_call,
                 api_key=api_key,
                 conversation_id=conversation_id,
-                state=self.state
+                stage=stage,
+                choice=choice
             )
         )
         if tool.show_in_stage:
