@@ -163,8 +163,9 @@ class GeneralPurposeAgent:
         })
 
         # 3. Print history: iterate through unpacked messages and print as json (json.dumps)
-        # for msg in unpack_messages_list:
-        #    print(json.dumps(msg, indent=2))
+        print("\nMessages History:")
+        for msg in unpack_messages_list:
+           print(json.dumps(msg, indent=2))
 
         # 4. Return unpacked messages
         return unpack_messages_list
@@ -201,8 +202,8 @@ class GeneralPurposeAgent:
                 choice=choice
             )
         )
-        if tool.show_in_stage:
-            stage.append_content(f"```text\n\r{tool_message.content or ""}\n\r```\n\r") # así está en file content tool
+        # if tool.show_in_stage:
+            # stage.append_content(f"```text\n\r{tool_message.content or ""}\n\r```\n\r") # así está en file content tool
             # stage.append_content(tool_message.content or "")
             # stage.append_content(f"```json\n\r{execution_result.model_dump_json(indent=2)}\n\r```\n\r")
 
@@ -210,6 +211,6 @@ class GeneralPurposeAgent:
         StageProcessor.close_stage_safely(stage)
 
         # 7. Return tool message as dict and don't forget to exclude none
-        # return tool_message.dict(exclude_none=True)
-        result = tool_message.model_dump(exclude_none=True)
-        return result
+        return tool_message.dict(exclude_none=True)
+        # result = tool_message.model_dump(exclude_none=True)
+        # return result
