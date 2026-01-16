@@ -44,17 +44,18 @@ class GeneralPurposeAgentApplication(ChatCompletion):
         # At the beginning this list can be empty. We will add here tools after they will be implemented
         # ---
         # 2. Add ImageGenerationTool with DIAL_ENDPOINT
+        tools.append(ImageGenerationTool(endpoint=DIAL_ENDPOINT))
+
         # 3. Add FileContentExtractionTool with DIAL_ENDPOINT
-        # tools.append(ImageGenerationTool(endpoint=DIAL_ENDPOINT))
-        # tools.append(FileContentExtractionTool(endpoint=DIAL_ENDPOINT))
+        tools.append(FileContentExtractionTool(endpoint=DIAL_ENDPOINT))
 
         # 4. Add RagTool with DIAL_ENDPOINT, DEPLOYMENT_NAME, and create DocumentCache (it has static method `create`)
-        document_cache = DocumentCache.create() # max_items=10, ttl_seconds=3600)
-        tools.append(RagTool(
-            endpoint=DIAL_ENDPOINT,
-            deployment_name=DEPLOYMENT_NAME,
-            document_cache=document_cache
-        ))
+        # document_cache = DocumentCache.create() # max_items=10, ttl_seconds=3600)
+        # tools.append(RagTool(
+        #     endpoint=DIAL_ENDPOINT,
+        #     deployment_name=DEPLOYMENT_NAME,
+        #     document_cache=document_cache
+        # ))
 
         # 5. Add PythonCodeInterpreterTool with DIAL_ENDPOINT, `http://localhost:8050/mcp` mcp_url, tool_name is
         #    `execute_code`, more detailed about tools see in repository https://github.com/khshanovskyi/mcp-python-code-interpreter
