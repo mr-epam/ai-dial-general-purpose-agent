@@ -157,7 +157,7 @@ class RagTool(BaseTool):
         #   - stream response to stage (user in real time will be able to see what the LLM responding while Generation step)
         #   - collect all content (we need to return it as tool execution result)
         async_dial = AsyncDial(base_url=self.endpoint, api_key=tool_call_params.api_key)
-        collected_content = ""
+
         chunks = await async_dial.chat.completions.create(
             messages=[
                 Message(role=Role.SYSTEM, content=_SYSTEM_PROMPT),
@@ -167,6 +167,8 @@ class RagTool(BaseTool):
             stream=True,
             api_version='2024-06-01-preview'
         )
+
+        collected_content = ""
         async for chunk in chunks:
             if chunk.choices and len(chunk.choices) > 0:
                 delta = chunk.choices[0].delta
@@ -176,7 +178,7 @@ class RagTool(BaseTool):
                     stage.append_content(content_part)
 
         # 19. return collected content as Message object
-        return Message(role=Role.TOOL, content=collected_content)
+        return Message(role=Role.TOOL.value, content=collected_content)
 
     def __augmentation(self, request: str, chunks: list[str]) -> str:
         #TODO: make prompt augmentation

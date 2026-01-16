@@ -47,7 +47,7 @@ def unpack_messages(messages: list[Message], state_history: list[dict[str, Any]]
 
             result.append(
                 {
-                    "role": message.role,
+                    "role": message.role.value,
                     "content": content
                 }
             )

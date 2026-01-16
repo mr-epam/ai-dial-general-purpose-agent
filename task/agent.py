@@ -64,6 +64,8 @@ class GeneralPurposeAgent:
         tool_call_index_map: dict[int, ToolCall] = {}
         content = ""
 
+        custom_content: CustomContent = CustomContent(attachments=[])
+
         # 4. Make async loop through `chunks` and then we need to collect content, tool calls and attachments:
         #   - If chunk has `choices` then:
         #       - Get 1st choice `delta`
@@ -102,6 +104,7 @@ class GeneralPurposeAgent:
         assistant_message = Message(
             role=Role.ASSISTANT,
             content=content,
+            custom_content=custom_content,
             tool_calls=[
                 ToolCall.validate(tool_call_delta)
                 for tool_call_delta in tool_call_index_map.values()
@@ -140,7 +143,10 @@ class GeneralPurposeAgent:
             )
 
         # 7. We don't have any tool calls and reasy to finish user request. Set choice with `state` and return `assistant_message`
-        assistant_message.custom_content = CustomContent(state=self.state)
+        # assistant_message.custom_content = CustomContent(state=self.state)
+
+        choice.set_state(self.state)
+
         return assistant_message
 
     def _prepare_messages(self, messages: list[Message]) -> list[dict[str, Any]]:
@@ -157,8 +163,8 @@ class GeneralPurposeAgent:
         })
 
         # 3. Print history: iterate through unpacked messages and print as json (json.dumps)
-        for msg in unpack_messages_list:
-            print(json.dumps(msg, indent=2))
+        # for msg in unpack_messages_list:
+        #    print(json.dumps(msg, indent=2))
 
         # 4. Return unpacked messages
         return unpack_messages_list
@@ -196,10 +202,14 @@ class GeneralPurposeAgent:
             )
         )
         if tool.show_in_stage:
-            stage.append_content(tool_message.content or "")
+            stage.append_content(f"```text\n\r{tool_message.content or ""}\n\r```\n\r") # así está en file content tool
+            # stage.append_content(tool_message.content or "")
+            # stage.append_content(f"```json\n\r{execution_result.model_dump_json(indent=2)}\n\r```\n\r")
 
         # 6. Close stage with StageProcessor
         StageProcessor.close_stage_safely(stage)
 
         # 7. Return tool message as dict and don't forget to exclude none
-        return tool_message.dict(exclude_none=True)
+        # return tool_message.dict(exclude_none=True)
+        result = tool_message.model_dump(exclude_none=True)
+        return result
