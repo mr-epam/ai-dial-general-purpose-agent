@@ -28,6 +28,18 @@
           "key": "{REPLACE_WITH_YOUR_API_KEY}"
         }
       ]
+    },
+    "dall-e-3": {
+      "displayName": "DALL-E",
+      "endpoint": "http://adapter-dial:5000/openai/deployments/dall-e-3/chat/completions",
+      "iconUrl": "http://localhost:3001/gpt3.svg",
+      "type": "chat",
+      "upstreams": [
+        {
+          "endpoint": "https://ai-proxy.lab.epam.com/openai/deployments/dall-e-3/chat/completions",
+          "key": "{REPLACE_WITH_YOUR_API_KEY}"
+        }
+      ]
     }
   },
   "keys": {
