@@ -14,8 +14,9 @@ class MCPTool(BaseTool):
     def __init__(self, client: MCPClient, mcp_tool_model: MCPToolModel):
         #TODO:
         # 1. Set client
+        self.client = client
         # 2. Set mcp_tool_model
-        raise NotImplementedError()
+        self.mcp_tool_model = mcp_tool_model
 
     async def _execute(self, tool_call_params: ToolCallParams) -> str | Message:
         #TODO:
@@ -23,19 +24,22 @@ class MCPTool(BaseTool):
         # 2. Get content with mcp client tool call
         # 3. Append retrieved content to stage
         # 4. return content
-        raise NotImplementedError()
+        arguments = json.loads(tool_call_params.tool_call.function.arguments)
+        content = await self.client.call_tool(self.mcp_tool_model.name, arguments)
+        tool_call_params.stage.append_content(content)
+        return content
 
     @property
     def name(self) -> str:
         # TODO: provide name from mcp_tool_model
-        raise NotImplementedError()
+        return self.mcp_tool_model.name
 
     @property
     def description(self) -> str:
         # TODO: provide description from mcp_tool_model
-        raise NotImplementedError()
+        return self.mcp_tool_model.description
 
     @property
     def parameters(self) -> dict[str, Any]:
         # TODO: provide parameters from mcp_tool_model
-        raise NotImplementedError()
+        return self.mcp_tool_model.parameters

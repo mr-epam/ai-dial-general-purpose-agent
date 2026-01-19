@@ -17,14 +17,18 @@ class DialFileContentExtractor:
     def extract_text(self, file_url: str) -> str:
         #TODO:
         # 1. Download with Dial client file by `file_url` (files -> download)
-        response = self.client.files.download(url=file_url)
-        # 2. Get downloaded file name and content
-        filename = response.filename # response._response.headers.get('Content-Disposition', '').split('filename=')[-1].strip('"')
-        file_content = response.get_content() # response._response.content
-        # 3. Get file extension, use for this `Path(filename).suffix.lower()`
-        file_extension = Path(filename).suffix.lower()
-        # 4. Call `__extract_text` and return its result
-        return self.__extract_text(file_content=file_content, file_extension=file_extension, filename=filename)
+        try:
+            response = self.client.files.download(url=file_url)
+            # 2. Get downloaded file name and content
+            filename = response.filename # response._response.headers.get('Content-Disposition', '').split('filename=')[-1].strip('"')
+            file_content = response.get_content() # response._response.content
+            # 3. Get file extension, use for this `Path(filename).suffix.lower()`
+            file_extension = Path(filename).suffix.lower()
+            # 4. Call `__extract_text` and return its result
+            return self.__extract_text(file_content=file_content, file_extension=file_extension, filename=filename)
+        except Exception as e:
+            print(f"Error downloading file from {file_url}: {e}")
+            return ""
 
     def __extract_text(self, file_content: bytes, file_extension: str, filename: str) -> str:
         """Extract text content based on file type."""
