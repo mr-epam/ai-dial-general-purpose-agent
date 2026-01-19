@@ -87,7 +87,6 @@ class RagTool(BaseTool):
         }
 
     async def _execute(self, tool_call_params: ToolCallParams) -> str | Message:
-        #TODO:
         # 1. Load arguments with `json`
         args = tool_call_params.tool_call.function.arguments
         arguments = json.loads(args) if args else {}
@@ -106,7 +105,7 @@ class RagTool(BaseTool):
         # 8. Create `cache_document_key`, it is string from `conversation_id` and `file_url`, with such key we guarantee
         #    access to cached indexes for one particular conversation,
         # 9. Get from `document_cache` by `cache_document_key` a cache
-        cache_document_key = f"{tool_call_params.conversation_id}_{file_url}"
+        cache_document_key = f"{tool_call_params.conversation_id}:{file_url}"
         cached_data = self.document_cache.get(cache_document_key)
         # 10. If cache is present then set it as `index, chunks = cached_data` (cached_data is retrieved cache from 9 step),
         #     otherwise:
@@ -122,13 +121,17 @@ class RagTool(BaseTool):
         else:
             extractor = DialFileContentExtractor(endpoint=self.endpoint, api_key=tool_call_params.api_key)
             text_content = extractor.extract_text(file_url=file_url)
+
             if not text_content:
+                stage.append_content("## Response: \n")
                 stage.append_content("Error: File content not found.\n\r")
                 return "Error: File content not found."
+
             chunks = self.text_splitter.split_text(text_content)
             embeddings = self.model.encode(chunks)
             index = faiss.IndexFlatL2(384)
             index.add(np.array(embeddings, dtype='float32'))
+
             self.document_cache.set(cache_document_key, index, chunks)
 
         # 11. Prepare `query_embedding` with model. You need to encode request as type 'float32'
@@ -136,9 +139,11 @@ class RagTool(BaseTool):
             self.model.encode([request]),
             dtype='float32'
         )
+
         # 12. Through created index make search with `query_embedding`, `k` set as 3. As response we expect tuple of
         #     `distances` and `indices`
         distances, indices = index.search(query_embedding, k=3)
+
         # Note: distances - how far the found embedding from query embedding, indices - positions in
 
         # 13. Now you need to iterate through `indices[0]` and and by each idx get element from `chunks`, result save as `retrieved_chunks`
@@ -160,12 +165,11 @@ class RagTool(BaseTool):
 
         chunks = await async_dial.chat.completions.create(
             messages=[
-                Message(role=Role.SYSTEM, content=_SYSTEM_PROMPT),
-                Message(role=Role.USER, content=augmented_prompt)
+                { "role": Role.SYSTEM, "content": _SYSTEM_PROMPT },
+                { "role": Role.USER, "content": augmented_prompt }
             ],
             deployment_name=self.deployment_name,
-            stream=True,
-            api_version='2024-06-01-preview'
+            stream=True
         )
 
         collected_content = ""
@@ -175,14 +179,16 @@ class RagTool(BaseTool):
                 if delta and delta.content:
                     content_part = delta.content
                     collected_content += content_part
-                    stage.append_content(content_part)
+                    # stage.append_content(content_part)
+                    tool_call_params.stage.append_content(content_part)
 
         # 19. return collected content as Message object
-        return Message(role=Role.TOOL.value, content=collected_content)
+        return collected_content
+        # return Message(role=Role.TOOL.value, content=collected_content)
 
     def __augmentation(self, request: str, chunks: list[str]) -> str:
-        #TODO: make prompt augmentation
-        return f"Request: {request}\n\nContext:\n" + "\n\n".join(chunks)
+        #TODO: make prompt augmentation        
+        return f"Context:\n" + "\n\n".join(chunks) + "\n\nRequest: " + request
         # Example:
         # return f"Answer the question based on the context below.\n\nContext:\n" + "\n\n".join(chunks) + f"\n\nQuestion: {request}"
         # Note: you can improve prompt augmentation to make LLM work better
