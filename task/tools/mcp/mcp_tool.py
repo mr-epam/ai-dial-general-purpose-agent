@@ -26,7 +26,13 @@ class MCPTool(BaseTool):
         # 4. return content
         arguments = json.loads(tool_call_params.tool_call.function.arguments)
         content = await self.client.call_tool(self.mcp_tool_model.name, arguments)
-        tool_call_params.stage.append_content(content)
+
+        stage = tool_call_params.stage
+        stage.append_content(f"## MCP tool Request: \n")
+        stage.append_content(f"**Tool**: {self.mcp_tool_model.name} \n")
+        stage.append_content("## Response: \n")
+        stage.append_content(content)
+
         return content
 
     @property
