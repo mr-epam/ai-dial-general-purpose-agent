@@ -132,24 +132,25 @@ class PythonCodeInterpreterTool(BaseTool):
         #           - Prepare Attachment with url, type (mime_type), and title (file_name)
         #           - Add attachment to stage and also add this attachment to choice (it will be chown in both stage and choice)
         #       - Add to execution_result json addition
-        dial_client = Dial(endpoint=self.dial_endpoint, api_key=tool_call_params.api_key)
+        dial_client = Dial(base_url=self.dial_endpoint, api_key=tool_call_params.api_key)
         files_home = dial_client.my_appdata_home
         for file in execution_result.files:
             file_name = file.name
             mime_type = file.mime_type
             resource = await self.mcp_client.get_resource(file.uri)
+
             if mime_type.startswith("text/") or mime_type in ["application/json", "application/xml"]:
                 resource = resource.decode("utf-8")
             else:   
                 resource = base64.b64decode(resource)
+
             url = f"files/{(files_home / file_name).as_posix()}"
             await dial_client.upload_file(url, resource, mime_type)
             attachment = Attachment(url=url, type=mime_type, title=file_name)
+
             stage.append_attachment(attachment)
             tool_call_params.choice.append_attachment(attachment)
-        execution_result.json_addition = {
-            "files": [file.uri for file in execution_result.files]
-        }
+
         if execution_result.output:
             execution_result.output = execution_result.output[:1000]
         stage.append_content(f"```json\n\r{execution_result.model_dump_json(indent=2)}\n\r```\n\r")
