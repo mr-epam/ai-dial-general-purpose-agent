@@ -40,6 +40,42 @@
           "key": "{REPLACE_WITH_YOUR_API_KEY}"
         }
       ]
+    },
+    "claude-sonnet-3-7": {
+      "displayName": "Claude Sonnet 3.7",
+      "endpoint": "http://adapter-dial:5000/openai/deployments/claude-3-7-sonnet/chat/completions",
+      "iconUrl": "https://chat.lab.epam.com/themes/anthropic.svg",
+      "type": "chat",
+      "upstreams": [
+        {
+          "endpoint": "https://ai-proxy.lab.epam.com/openai/deployments/claude-3-7-sonnet@20250219/chat/completions",
+          "key": "{REPLACE_WITH_YOUR_API_KEY}"
+        }
+      ]
+    },
+    "claude-3-5-haiku": {
+      "displayName": "Claude 3.5 Haiku",
+      "endpoint": "http://adapter-dial:5000/openai/deployments/claude-3-5-haiku/chat/completions",
+      "iconUrl": "https://chat.lab.epam.com/themes/anthropic.svg",
+      "type": "chat",
+      "upstreams": [
+        {
+          "endpoint": "https://ai-proxy.lab.epam.com/openai/deployments/claude-3-5-haiku@20241022/chat/completions",
+          "key": "{REPLACE_WITH_YOUR_API_KEY}"
+        }
+      ]
+    },
+    "claude-sonnet-4": {
+      "displayName": "Claude Sonnet 4",
+      "endpoint": "http://adapter-dial:5000/openai/deployments/claude-sonnet-4/chat/completions",
+      "iconUrl": "https://chat.lab.epam.com/themes/anthropic.svg",
+      "type": "chat",
+      "upstreams": [
+        {
+          "endpoint": "https://ai-proxy.lab.epam.com/openai/deployments/claude-sonnet-4@20250514/chat/completions",
+          "key": "{REPLACE_WITH_YOUR_API_KEY}"
+        }
+      ]
     }
   },
   "keys": {
