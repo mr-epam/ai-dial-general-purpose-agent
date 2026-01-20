@@ -14,8 +14,17 @@ from task.tools.rag.document_cache import DocumentCache
 from task.utils.dial_file_conent_extractor import DialFileContentExtractor
 
 # TODO: provide system prompt for Generation step
-_SYSTEM_PROMPT = """
-"""
+_SYSTEM_PROMPT = """You are a helpful assistant that answers questions based on the provided context from documents.
+
+Your task is to:
+1. Answer the user's request using only the information provided in the context
+2. Be accurate and concise in your responses
+3. If the context does not contain enough information to fully answer the question, clearly state what information is available and what is missing
+4. If the context contradicts the question or contains no relevant information, politely indicate that you cannot answer based on the provided context
+5. Cite specific details from the context when providing answers
+6. Maintain a helpful and professional tone
+
+Remember: Only use information from the provided context. Do not use any external knowledge or make assumptions beyond what is explicitly stated in the context."""
 
 
 class RagTool(BaseTool):
@@ -179,8 +188,8 @@ class RagTool(BaseTool):
                 if delta and delta.content:
                     content_part = delta.content
                     collected_content += content_part
-                    # stage.append_content(content_part)
-                    tool_call_params.stage.append_content(content_part)
+                    stage.append_content(content_part)
+                    # tool_call_params.stage.append_content(content_part)
 
         # 19. return collected content as Message object
         return collected_content
